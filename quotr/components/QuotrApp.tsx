@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-const fmt = (v) =>
+const fmt = (v: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(v);
-const fmtDec = (v) =>
+const fmtDec = (v: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
@@ -17,7 +17,7 @@ const fmtDec = (v) =>
     maximumFractionDigits: 2,
   }).format(v);
 
-function calcMonthly(amount, apr, months) {
+function calcMonthly(amount: number, apr: number, months: number): number {
   if (apr === 0) return amount / months;
   const r = apr / 100 / 12;
   return (
@@ -87,7 +87,13 @@ const css = `
 `;
 
 // ─── DEMO TOGGLE BAR ─────────────────────────────────────────────────
-function DemoBar({ view, setView }) {
+function DemoBar({
+  view,
+  setView,
+}: {
+  view: string;
+  setView: (v: string) => void;
+}) {
   return (
     <div
       style={{
@@ -144,7 +150,7 @@ function DemoBar({ view, setView }) {
 }
 
 // ─── CONTRACTOR VIEW ─────────────────────────────────────────────────
-function ContractorView({ onSent }) {
+function ContractorView({ onSent }: { onSent: (q: object) => void }) {
   const [customer, setCustomer] = useState("");
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState("");
@@ -525,7 +531,7 @@ function ContractorView({ onSent }) {
 }
 
 // ─── SENT CONFIRMATION ────────────────────────────────────────────────
-function SentView({ quote, onAnother }) {
+function SentView({ quote, onAnother }: { quote: any; onAnother: () => void }) {
   const lowest = calcMonthly(quote.amount, 0, 12);
   return (
     <div
@@ -699,7 +705,7 @@ function SentView({ quote, onAnother }) {
 }
 
 // ─── CUSTOMER VIEW ────────────────────────────────────────────────────
-function CustomerView({ quote }) {
+function CustomerView({ quote }: { quote: any }) {
   const [selected, setSelected] = useState(0);
   const [showPlans, setShowPlans] = useState(false);
   const [applying, setApplying] = useState(false);

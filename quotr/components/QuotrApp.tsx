@@ -150,7 +150,7 @@ function DemoBar({
 }
 
 // ─── CONTRACTOR VIEW ─────────────────────────────────────────────────
-function ContractorView({ onSent }: { onSent: (q: object) => void }) {
+function ContractorView({ onSent }: { onSent: (q: any) => void }) {
   const [customer, setCustomer] = useState("");
   const [phone, setPhone] = useState("");
   const [amount, setAmount] = useState("");
@@ -1409,7 +1409,7 @@ function CustomerView({ quote }: { quote: any }) {
 export default function App() {
   const [view, setView] = useState("contractor");
   const [state, setState] = useState("form");
-  const [sentData, setSentData] = useState(null);
+  const [sentData, setSentData] = useState<any>(null);
 
   const DEMO_QUOTE = {
     contractor: "Mike's Roofing Co.",

@@ -17,14 +17,14 @@ export default function Login() {
     if (isSignup) {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) setError(error.message);
-      else router.push("/dashboard");
+      else router.push("/");
     } else {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       if (error) setError(error.message);
-      else router.push("/dashboard");
+      else router.push("/");
     }
     setLoading(false);
   };

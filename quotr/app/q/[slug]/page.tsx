@@ -11,7 +11,8 @@ export default async function QuotePage({ params }: { params: Promise<{ slug: st
       *,
       contractors (
         business_name,
-        email
+        email,
+        logo_url
       )
     `)
     .eq('slug', slug)

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
+import BottomNav from "./BottomNav";
 
 const fmt = (v: number) =>
   new Intl.NumberFormat("en-US", {
@@ -71,6 +72,7 @@ const TRADES = [
   "Flooring",
   "Bathroom",
   "General",
+  "Other",
 ];
 
 const css = `
@@ -159,6 +161,7 @@ function ContractorView({ onSent }: { onSent: (q: any) => void }) {
   const [desc, setDesc] = useState("");
   const [expiry, setExpiry] = useState("7");
   const [sending, setSending] = useState(false);
+  const [customTrade, setCustomTrade] = useState("");
 
   const num = Number(amount.replace(/[^0-9]/g, "")) || 0;
   const lowest = num > 0 ? calcMonthly(num, 0, 12) : 0;
@@ -180,7 +183,7 @@ function ContractorView({ onSent }: { onSent: (q: any) => void }) {
         customer_name: customer,
         customer_phone: phone,
         amount: num,
-        trade,
+        trade: trade === "Other" ? customTrade : trade,
         description: desc,
         expiry_days: Number(expiry),
         contractor_id: user?.id,
@@ -236,7 +239,7 @@ function ContractorView({ onSent }: { onSent: (q: any) => void }) {
         fontFamily: "'Familjen Grotesk',sans-serif",
         maxWidth: "430px",
         margin: "0 auto",
-        paddingBottom: "48px",
+        paddingBottom: "80px",
       }}
     >
       {/* Header */}
@@ -450,6 +453,15 @@ function ContractorView({ onSent }: { onSent: (q: any) => void }) {
                   </div>
                 ))}
               </div>
+
+              {trade === "Other" && (
+                <input
+                  style={{ ...inp, marginTop: "10px", fontSize: "14px" }}
+                  placeholder="Enter trade type..."
+                  value={customTrade}
+                  onChange={(e) => setCustomTrade(e.target.value)}
+                />
+              )}
             </div>
 
             <div style={{ marginBottom: "18px" }}>
@@ -1450,6 +1462,7 @@ export default function App() {
         />
       )}
       {view === "customer" && <CustomerView quote={DEMO_QUOTE} />}
+      <BottomNav />
     </div>
   );
 }

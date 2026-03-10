@@ -758,7 +758,6 @@ export default function CustomerPage({ quote }: { quote: any }) {
             lineHeight: 2,
           }}
         >
-          Financing provided by Wisetack
           <br />
           Powered by Quotr · Subject to credit approval
         </div>

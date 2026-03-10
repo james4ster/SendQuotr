@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import BottomNav from "./BottomNav";
 
@@ -308,7 +308,16 @@ function ContractorView({ onSent }: { onSent: (q: any) => void }) {
             placeholder="e.g. (215) 555-0182"
             type="tel"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => {
+              const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+              let formatted = digits;
+              if (digits.length >= 7)
+                formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+              else if (digits.length >= 4)
+                formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+              else if (digits.length >= 1) formatted = `(${digits}`;
+              setPhone(formatted);
+            }}
           />
         </div>
 
@@ -651,46 +660,6 @@ function SentView({ quote, onAnother }: { quote: any; onAnother: () => void }) {
           Tap to view &amp; apply:
           <br />
           <span style={{ color: "#60a5fa" }}>sendquotr.com/q/••••••</span>
-        </div>
-      </div>
-
-      {/* Commission */}
-      <div
-        style={{
-          background: "rgba(245,158,11,0.08)",
-          border: "1px solid rgba(245,158,11,0.18)",
-          borderRadius: "14px",
-          padding: "16px 18px",
-          marginBottom: "20px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          <div
-            style={{
-              fontSize: "11px",
-              color: "#f59e0b",
-              letterSpacing: "1px",
-              fontWeight: 700,
-              marginBottom: "4px",
-            }}
-          >
-            IF THEY FINANCE
-          </div>
-          <div style={{ fontSize: "14px", color: "#94a3b8" }}>
-            Your estimated commission
-          </div>
-        </div>
-        <div
-          style={{
-            fontFamily: "'Instrument Serif',serif",
-            fontSize: "30px",
-            color: "#f59e0b",
-          }}
-        >
-          {fmt(quote.amount * 0.02)}
         </div>
       </div>
 
@@ -1408,7 +1377,6 @@ function CustomerView({ quote }: { quote: any }) {
             lineHeight: 2,
           }}
         >
-          Financing provided by Wisetack
           <br />
           Powered by Quotr · Subject to credit approval
         </div>
@@ -1422,27 +1390,50 @@ export default function App() {
   const [view, setView] = useState("contractor");
   const [state, setState] = useState("form");
   const [sentData, setSentData] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
+  const [authed, setAuthed] = useState(false);
+
+  useEffect(() => {
+    const load = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      setAuthed(true);
+      const { data } = await supabase
+        .from("contractors")
+        .select("business_name, trade_type, logo_url")
+        .eq("id", user.id)
+        .single();
+      if (data) setProfile(data);
+    };
+    load();
+  }, []);
 
   const DEMO_QUOTE = {
-    contractor: "Mike's Roofing Co.",
+    contractor: profile?.business_name || "Your Business Name",
+    logo_url: profile?.logo_url || null,
     customer: "Sarah Thompson",
     amount: 12400,
-    trade: "Roofing",
-    desc: "Full roof replacement, architectural shingles, 2,400 sq ft. Includes removal of existing roof and complete site cleanup.",
+    trade: profile?.trade_type || "Roofing",
+    desc: "Full roof replacement, architectural shingles, 2,400 sq ft.",
     expiry: "7",
   };
 
   return (
     <div style={{ background: "#0a0f1a", minHeight: "100vh" }}>
       <style>{css}</style>
-      <DemoBar
-        view={view}
-        setView={(v) => {
-          setView(v);
-          setState("form");
-          setSentData(null);
-        }}
-      />
+
+      {!authed && (
+        <DemoBar
+          view={view}
+          setView={(v) => {
+            setView(v);
+            setState("form");
+            setSentData(null);
+          }}
+        />
+      )}
 
       {view === "contractor" && state === "form" && (
         <ContractorView
